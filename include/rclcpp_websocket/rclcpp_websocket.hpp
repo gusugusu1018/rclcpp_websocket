@@ -29,18 +29,18 @@ namespace rclcpp_websocket
         {
             RCLCPP_INFO(this->get_logger(), "subscribe topic : %s\nserver port: %d", sub_topic_name.c_str(), port);
             // Set logging settings (/usr/local/includewebsocketpp/logger/levels.hpp)
-            m_endpoint.set_error_channels(websocketpp::log::elevel::warn);
-            m_endpoint.set_access_channels(websocketpp::log::alevel::all ^ websocketpp::log::alevel::frame_payload);
+            endpoint_.set_error_channels(websocketpp::log::elevel::warn);
+            endpoint_.set_access_channels(websocketpp::log::alevel::all ^ websocketpp::log::alevel::frame_payload);
 
             // Initialize Asio
-            m_endpoint.init_asio();
+            endpoint_.init_asio();
 
             // Set websocket handlers
-            m_endpoint.set_open_handler(websocketpp::lib::bind(&RclcppWebsocket::on_open,this,std::placeholders::_1));
-            m_endpoint.set_close_handler(websocketpp::lib::bind(&RclcppWebsocket::on_close,this,std::placeholders::_1));
+            endpoint_.set_open_handler(websocketpp::lib::bind(&RclcppWebsocket::on_open,this,std::placeholders::_1));
+            endpoint_.set_close_handler(websocketpp::lib::bind(&RclcppWebsocket::on_close,this,std::placeholders::_1));
 
             // Set the default message handler to the echo handler
-            m_endpoint.set_message_handler(std::bind(
+            endpoint_.set_message_handler(std::bind(
                 &RclcppWebsocket::echo_handler, this,
                 std::placeholders::_1, std::placeholders::_2
             ));
@@ -52,8 +52,8 @@ namespace rclcpp_websocket
                     RCLCPP_INFO(this->get_logger(), "%s",msg->data.c_str());
                     // Broadcast count to all connections
                     con_list::iterator it;
-                    for (it = m_connections.begin(); it != m_connections.end(); ++it) {
-                        m_endpoint.send(*it,msg->data.c_str(),websocketpp::frame::opcode::text);
+                    for (it = connections_.begin(); it != connections_.end(); ++it) {
+                        endpoint_.send(*it,msg->data.c_str(),websocketpp::frame::opcode::text);
                     }
                 };
 
@@ -69,32 +69,32 @@ namespace rclcpp_websocket
 
         void ws_run(std::uint16_t port){
             // Listen on port 9002
-            m_endpoint.listen(port);
+            endpoint_.listen(port);
 
             // Queues a connection accept operation
-            m_endpoint.start_accept();
+            endpoint_.start_accept();
 
             // Start the ASIO io_service run loop
-            boost::thread run_thread(boost::bind(&server::run, boost::ref(m_endpoint)));
+            boost::thread run_thread(boost::bind(&server::run, boost::ref(endpoint_)));
         }
 
         void echo_handler(websocketpp::connection_hdl hdl, server::message_ptr msg) {
             // Write a new message
-            m_endpoint.send(hdl, msg->get_payload(), msg->get_opcode());
+            endpoint_.send(hdl, msg->get_payload(), msg->get_opcode());
         }
 
         void on_open(websocketpp::connection_hdl hdl) {
-            m_connections.insert(hdl);
+            connections_.insert(hdl);
         }
 
         void on_close(websocketpp::connection_hdl hdl) {
-            m_connections.erase(hdl);
+            connections_.erase(hdl);
         }
 
     private:
-        server m_endpoint;
+        server endpoint_;
         typedef std::set<websocketpp::connection_hdl,std::owner_less<websocketpp::connection_hdl>> con_list;
-        con_list m_connections;
+        con_list connections_;
 
         rclcpp::Subscription<std_msgs::msg::String>::SharedPtr sub_;
     };
