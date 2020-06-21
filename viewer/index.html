@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+
+    <h1>rclcpp websocket demo</h1>
+    <div id="message">message</div>
+    <input type="button" id="submit" value="Send">
+
+    <script>
+        var sock = new WebSocket('ws://127.0.0.1:9002');
+
+        // connectEvent
+        sock.addEventListener('open',function(e){
+            console.log('Socket connection established');
+        });
+
+        // message From server
+        sock.addEventListener('message',function(e){
+            console.log(e.data);
+            const msg = document.getElementById("message");
+            msg.textContent = e.data;
+        });
+
+        document.addEventListener('DOMContentLoaded',function(e){
+            // When button is clicked, send message to server
+            document.getElementById('submit').addEventListener('click',function(e){
+                sock.send('clicked!!');
+            });
+        });
+
+    </script>
+</body>
+</html>
