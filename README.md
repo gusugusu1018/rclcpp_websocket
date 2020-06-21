@@ -1,12 +1,13 @@
-# rclcpp_websocket
+# rclcpp_websocket - ROS2 websocket Library for C++
 
+**warning** still in progress
 
-# Dependensies
+## Dependensies
 * [ROS2 (Eloquent Elusor)](https://index.ros.org/doc/ros2/Installation/Eloquent/)
 * [Boost](https://www.boost.org/)
 * [Websocket++ (0.82)](https://github.com/zaphoyd/websocketpp) - C++ websocket client/server library
 
-# Install
+## Install
 
 Install websocketpp
 
@@ -36,7 +37,7 @@ colcon build --package-select rclcpp_websocket
 source install/setup.bash // or setup.zsh
 ```
 
-# Getting Started
+## Getting Started
 
 run node
 
