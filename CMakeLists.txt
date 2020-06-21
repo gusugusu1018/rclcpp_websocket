@@ -28,6 +28,8 @@ message("## Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}")
 message("## Websocketpp_INCLUDE_DIRS: ${WEBSOCKETPP_INCLUDE_DIR}")
 
 include_directories(
+  include
+  ${rclcpp_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS} 
   ${WEBSOCKETPP_INCLUDE_DIR})
 
